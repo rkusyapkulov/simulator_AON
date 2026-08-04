@@ -1,4 +1,4 @@
-#ifndef UNICODE
+п»ї#ifndef UNICODE
 #define UNICODE
 #endif
 #ifndef _UNICODE
@@ -14,11 +14,11 @@
 
 #pragma comment(lib, "winmm.lib")
 
-// --- Константы ОБНОВЛЕННОЙ архитектуры ---
-const DWORD ROM_SIZE = 4096;      // 4 КБ ПЗУ (0x0000 - 0x0FFF)
-const DWORD RAM_SIZE = 2048;      // ИСПРАВЛЕНО: 2 КБ ОЗУ под новый дамп
-const DWORD RAM_START = 0x8000;    // ИСПРАВЛЕНО: Начало ОЗУ по адресу 0x8000
-const DWORD RAM_END = 0x87FF;    // ИСПРАВЛЕНО: Конец ОЗУ по адресу 0x87FF
+// --- РљРѕРЅСЃС‚Р°РЅС‚С‹ РћР‘РќРћР’Р›Р•РќРќРћР™ Р°СЂС…РёС‚РµРєС‚СѓСЂС‹ ---
+const DWORD ROM_SIZE = 4096;      // 4 РљР‘ РџР—РЈ (0x0000 - 0x0FFF)
+const DWORD RAM_SIZE = 2048;      // РРЎРџР РђР’Р›Р•РќРћ: 2 РљР‘ РћР—РЈ РїРѕРґ РЅРѕРІС‹Р№ РґР°РјРї
+const DWORD RAM_START = 0x8000;    // РРЎРџР РђР’Р›Р•РќРћ: РќР°С‡Р°Р»Рѕ РћР—РЈ РїРѕ Р°РґСЂРµСЃСѓ 0x8000
+const DWORD RAM_END = 0x87FF;    // РРЎРџР РђР’Р›Р•РќРћ: РљРѕРЅРµС† РћР—РЈ РїРѕ Р°РґСЂРµСЃСѓ 0x87FF
 
 BYTE rom[ROM_SIZE];
 BYTE ram[RAM_SIZE];
@@ -31,20 +31,20 @@ const int MAX_LIFETIME = 15;
 bool keys_pressed[12] = { false }; 
 bool emulator_running = true;
 
-// --- ЭМУЛЯЦИЯ БИПЕРА INTE ---
-bool rk_inte_speaker_state = false; // Текущее состояние динамика от INTE
+// --- Р­РњРЈР›РЇР¦РРЇ Р‘РРџР•Р Рђ INTE ---
+bool rk_inte_speaker_state = false; // РўРµРєСѓС‰РµРµ СЃРѕСЃС‚РѕСЏРЅРёРµ РґРёРЅР°РјРёРєР° РѕС‚ INTE
 
-// Текущее состояние динамика от Порта C
+// РўРµРєСѓС‰РµРµ СЃРѕСЃС‚РѕСЏРЅРёРµ РґРёРЅР°РјРёРєР° РѕС‚ РџРѕСЂС‚Р° C
 bool rk_port_c_speaker_state = false;
 
-// --- ПАРАМЕТРЫ ЗВУКОВОГО ПОТОКА ---
+// --- РџРђР РђРњР•РўР Р« Р—Р’РЈРљРћР’РћР“Рћ РџРћРўРћРљРђ ---
 const int AUDIO_SAMPLE_RATE = 22050;
 HWAVEOUT hWaveOut = NULL;
 WAVEHDR waveHeader[2];
 short* audioBuffers[2] = { NULL, NULL };
 const int AUDIO_BUF_SIZE = 1024;
 
-// --- Кольцевой буфер синхронизации INTE ---
+// --- РљРѕР»СЊС†РµРІРѕР№ Р±СѓС„РµСЂ СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё INTE ---
 const int INTE_RING_BUF_SIZE = 16384;
 short inte_ring_buffer[INTE_RING_BUF_SIZE] = { 0 };
 volatile int inte_ring_write_ptr = 0;
@@ -52,8 +52,8 @@ volatile int inte_ring_read_ptr = 0;
 
 HWND hEditDisplay = NULL;
 HWND hEditDebug = NULL;
-HWND hEditRAM = NULL;      // Изменено: отображает регион 0x82B0 - 0x82FF
-HWND hEditRAM_Low = NULL;  // Изменено: отображает начальный регион ОЗУ 0x8000 - 0x807F
+HWND hEditRAM = NULL;      // РР·РјРµРЅРµРЅРѕ: РѕС‚РѕР±СЂР°Р¶Р°РµС‚ СЂРµРіРёРѕРЅ 0x82B0 - 0x82FF
+HWND hEditRAM_Low = NULL;  // РР·РјРµРЅРµРЅРѕ: РѕС‚РѕР±СЂР°Р¶Р°РµС‚ РЅР°С‡Р°Р»СЊРЅС‹Р№ СЂРµРіРёРѕРЅ РћР—РЈ 0x8000 - 0x807F
 HWND hBtnKeys[12] = { NULL };
 UINT_PTR timerId = 0;
 WNDPROC OldButtonProc = NULL; 
@@ -61,7 +61,7 @@ WNDPROC OldButtonProc = NULL;
 char DecodeSegment(BYTE segments) {
     BYTE mask = (~segments) & 0x7F;
     switch (mask) {
-        // Стандартные символы
+        // РЎС‚Р°РЅРґР°СЂС‚РЅС‹Рµ СЃРёРјРІРѕР»С‹
     case 0x3F: return '0'; case 0x06: return '1'; case 0x5B: return '2';
     case 0x4F: return '3'; case 0x66: return '4'; case 0x6D: return '5';
     case 0x7D: return '6'; case 0x07: return '7'; case 0x7F: return '8';
@@ -69,13 +69,13 @@ char DecodeSegment(BYTE segments) {
     case 0x39: return 'C'; case 0x5E: return 'd'; case 0x79: return 'E';
     case 0x71: return 'F'; case 0x40: return '-'; case 0x00: return ' ';
 
-        // Одиночные сегменты (для пошагового теста)
-    case 0x01: return 'a'; // Верхний
-    case 0x02: return 'b'; // Верхний правый
-    case 0x04: return 'c'; // Нижний правый
-    case 0x08: return 'd'; // Нижний
-    case 0x10: return 'e'; // Нижний левый
-    case 0x20: return 'f'; // Верхний левый
+        // РћРґРёРЅРѕС‡РЅС‹Рµ СЃРµРіРјРµРЅС‚С‹ (РґР»СЏ РїРѕС€Р°РіРѕРІРѕРіРѕ С‚РµСЃС‚Р°)
+    case 0x01: return 'a'; // Р’РµСЂС…РЅРёР№
+    case 0x02: return 'b'; // Р’РµСЂС…РЅРёР№ РїСЂР°РІС‹Р№
+    case 0x04: return 'c'; // РќРёР¶РЅРёР№ РїСЂР°РІС‹Р№
+    case 0x08: return 'd'; // РќРёР¶РЅРёР№
+    case 0x10: return 'e'; // РќРёР¶РЅРёР№ Р»РµРІС‹Р№
+    case 0x20: return 'f'; // Р’РµСЂС…РЅРёР№ Р»РµРІС‹Р№
 
     default: return 'H';
     }
@@ -87,12 +87,12 @@ struct CPU8080 {
 	WORD PC, SP;
     bool S, Z, AC, P, CY;
 	bool EI;
-	bool halted; // <-- ДОБАВИТЬ: флаг останова процессора
+	bool halted; // <-- Р”РћР‘РђР’РРўР¬: С„Р»Р°Рі РѕСЃС‚Р°РЅРѕРІР° РїСЂРѕС†РµСЃСЃРѕСЂР°
     bool INTE;
-    int cycles_until_interrupt = 35600; // 1780000 Гц / 50 Гц = 35600 тактов на кадр
-    bool int_pending = false;           // Флаг того, что прерывание пришло от дисплея
+    int cycles_until_interrupt = 35600; // 1780000 Р“С† / 50 Р“С† = 35600 С‚Р°РєС‚РѕРІ РЅР° РєР°РґСЂ
+    bool int_pending = false;           // Р¤Р»Р°Рі С‚РѕРіРѕ, С‡С‚Рѕ РїСЂРµСЂС‹РІР°РЅРёРµ РїСЂРёС€Р»Рѕ РѕС‚ РґРёСЃРїР»РµСЏ
 
-	// Три порта КР580ВВ55 (ППА)
+	// РўСЂРё РїРѕСЂС‚Р° РљР 580Р’Р’55 (РџРџРђ)
 	BYTE ppi_pa, ppi_pb, ppi_pc, ppi_ctrl;
 
 	void Reset() {
@@ -101,7 +101,7 @@ struct CPU8080 {
 		A = B = C = D = E = H = L = 0;
 		S = Z = AC = P = CY = false;
 		EI = false;
-		halted = false; // <-- ДОБАВИТЬ: сброс флага при перезагрузке
+		halted = false; // <-- Р”РћР‘РђР’РРўР¬: СЃР±СЂРѕСЃ С„Р»Р°РіР° РїСЂРё РїРµСЂРµР·Р°РіСЂСѓР·РєРµ
 		ppi_pa = ppi_pb = ppi_pc = 0xFF; ppi_ctrl = 0x9B;
         rk_inte_speaker_state = false;
 	}
@@ -171,11 +171,11 @@ struct CPU8080 {
             }
         }
 
-        // 2. КЛАВИАТУРА (Мультиплексор 155КП1)
+        // 2. РљР›РђР’РРђРўРЈР Рђ (РњСѓР»СЊС‚РёРїР»РµРєСЃРѕСЂ 155РљРџ1)
         int kp1_address = (ppi_pb >> 4) & 0x0F;
         bool key_detected_this_tick = false;
         if (kp1_address >= 0 && kp1_address < 12 && keys_pressed[kp1_address]) {
-            ppi_pc |= 0x04; // Активная единица на PC2
+            ppi_pc |= 0x04; // РђРєС‚РёРІРЅР°СЏ РµРґРёРЅРёС†Р° РЅР° PC2
             key_detected_this_tick = true;
             const wchar_t* layout = L"0123456789*#";
             if (kp1_address >= 0 && kp1_address <= 11) {
@@ -238,7 +238,7 @@ struct CPU8080 {
     void PortOutput(BYTE port, BYTE value) {
         if (port < 0xC0 || port > 0xC3) return;
 
-        // Фиксируем старое состояние звука перед записью
+        // Р¤РёРєСЃРёСЂСѓРµРј СЃС‚Р°СЂРѕРµ СЃРѕСЃС‚РѕСЏРЅРёРµ Р·РІСѓРєР° РїРµСЂРµРґ Р·Р°РїРёСЃСЊСЋ
         BYTE old_sound = ppi_pc & 0x90;
 
         switch (port) {
@@ -247,7 +247,7 @@ struct CPU8080 {
         case 0xC2: ppi_pc = value; break;
         case 0xC3:
             ppi_ctrl = value;
-            if ((value & 0x80) == 0) { // Побитный режим установки/сброса Порта C
+            if ((value & 0x80) == 0) { // РџРѕР±РёС‚РЅС‹Р№ СЂРµР¶РёРј СѓСЃС‚Р°РЅРѕРІРєРё/СЃР±СЂРѕСЃР° РџРѕСЂС‚Р° C
                 int bit = (value >> 1) & 0x07;
                 if (value & 1) ppi_pc |= (1 << bit);
                 else ppi_pc &= ~(1 << bit);
@@ -256,9 +256,9 @@ struct CPU8080 {
         }
         UpdateHardwareState();
 
-        // ОБНОВЛЕННЫЙ АСИНХРОННЫЙ АУДИО-ДЕТЕКТОР ДЛЯ ПОРТА C
-        // Если на линиях PC7 или PC4 есть единица — включаем динамик, если ноль — выключаем.
-        // Это выполняется мгновенно и не тормозит эмулятор!
+        // РћР‘РќРћР’Р›Р•РќРќР«Р™ РђРЎРРќРҐР РћРќРќР«Р™ РђРЈР”РРћ-Р”Р•РўР•РљРўРћР  Р”Р›РЇ РџРћР РўРђ C
+        // Р•СЃР»Рё РЅР° Р»РёРЅРёСЏС… PC7 РёР»Рё PC4 РµСЃС‚СЊ РµРґРёРЅРёС†Р° вЂ” РІРєР»СЋС‡Р°РµРј РґРёРЅР°РјРёРє, РµСЃР»Рё РЅРѕР»СЊ вЂ” РІС‹РєР»СЋС‡Р°РµРј.
+        // Р­С‚Рѕ РІС‹РїРѕР»РЅСЏРµС‚СЃСЏ РјРіРЅРѕРІРµРЅРЅРѕ Рё РЅРµ С‚РѕСЂРјРѕР·РёС‚ СЌРјСѓР»СЏС‚РѕСЂ!
         if (ppi_pc & 0x90) {
             rk_port_c_speaker_state = true;
         }
@@ -268,7 +268,7 @@ struct CPU8080 {
     }
 
     BYTE Read(WORD address) {
-        // ИСПРАВЛЕНИЕ: Превращаем 0xC000..0xC003 в порты 0xC0..0xC3
+        // РРЎРџР РђР’Р›Р•РќРР•: РџСЂРµРІСЂР°С‰Р°РµРј 0xC000..0xC003 РІ РїРѕСЂС‚С‹ 0xC0..0xC3
         if (address >= 0xC000 && address <= 0xC003) {
             return PortInput((BYTE)(0xC0 + (address & 0x03)));
         }
@@ -278,7 +278,7 @@ struct CPU8080 {
     }
 
     void Write(WORD address, BYTE value) {
-        // ИСПРАВЛЕНИЕ: Превращаем 0xC000..0xC003 в порты 0xC0..0xC3
+        // РРЎРџР РђР’Р›Р•РќРР•: РџСЂРµРІСЂР°С‰Р°РµРј 0xC000..0xC003 РІ РїРѕСЂС‚С‹ 0xC0..0xC3
         if (address >= 0xC000 && address <= 0xC003) {
             PortOutput((BYTE)(0xC0 + (address & 0x03)), value);
             return;
@@ -290,7 +290,7 @@ struct CPU8080 {
     }
 
 	int Step() {
-		// Таблица базовых тактов для всех 256 инструкций Intel 8080
+		// РўР°Р±Р»РёС†Р° Р±Р°Р·РѕРІС‹С… С‚Р°РєС‚РѕРІ РґР»СЏ РІСЃРµС… 256 РёРЅСЃС‚СЂСѓРєС†РёР№ Intel 8080
 		static const int lut_cycles[256] = {
 			4, 10, 7,  5,  5,  5,  7,  4,  4, 10, 7,  5,  5,  5,  7,  4,  // 00-0F
 			4, 10, 7,  5,  5,  5,  7,  4,  4, 10, 7,  5,  5,  5,  7,  4,  // 10-1F
@@ -310,32 +310,32 @@ struct CPU8080 {
 			5, 10, 10, 10, 11, 11, 7,  11, 5, 10, 10, 10, 11, 17, 7,  11  // F0-FF
 		};
 
-		// 1. Проверяем аппаратное прерывание перед декодированием инструкции
+		// 1. РџСЂРѕРІРµСЂСЏРµРј Р°РїРїР°СЂР°С‚РЅРѕРµ РїСЂРµСЂС‹РІР°РЅРёРµ РїРµСЂРµРґ РґРµРєРѕРґРёСЂРѕРІР°РЅРёРµРј РёРЅСЃС‚СЂСѓРєС†РёРё
 		if (int_pending && EI) {
 			int_pending = false;
 			halted = false;
 		}
 
-		// 2. Если процессор в состоянии HLT
+		// 2. Р•СЃР»Рё РїСЂРѕС†РµСЃСЃРѕСЂ РІ СЃРѕСЃС‚РѕСЏРЅРёРё HLT
 		if (halted) {
-			return 4; // Будем возвращать по 4 такта
+			return 4; // Р‘СѓРґРµРј РІРѕР·РІСЂР°С‰Р°С‚СЊ РїРѕ 4 С‚Р°РєС‚Р°
 		}
 
 		BYTE op = Read(PC++);
 		int cycles = lut_cycles[op];
 
-		// Группа команд MOV r1, r2 (исключая MOV M, M, которая является HLT 0x76)
+		// Р“СЂСѓРїРїР° РєРѕРјР°РЅРґ MOV r1, r2 (РёСЃРєР»СЋС‡Р°СЏ MOV M, M, РєРѕС‚РѕСЂР°СЏ СЏРІР»СЏРµС‚СЃСЏ HLT 0x76)
 		if ((op & 0xC0) == 0x40 && op != 0x76) {
 			SetReg((op >> 3) & 7, GetReg(op & 7));
 			return cycles;
 		}
 
 		switch (op) {
-			// NOP инструкции
+			// NOP РёРЅСЃС‚СЂСѓРєС†РёРё
 		case 0x00: case 0x08: case 0x10: case 0x18: case 0x20: case 0x28:
 		case 0x30: case 0x38: return cycles;
 
-			// Останавливаем процессор до аппаратного прерывания
+			// РћСЃС‚Р°РЅР°РІР»РёРІР°РµРј РїСЂРѕС†РµСЃСЃРѕСЂ РґРѕ Р°РїРїР°СЂР°С‚РЅРѕРіРѕ РїСЂРµСЂС‹РІР°РЅРёСЏ
 		case 0x76: halted = true; return cycles;
 
 			// MVI r, imm
@@ -386,7 +386,7 @@ struct CPU8080 {
 		case 0xB8: case 0xB9: case 0xBA: case 0xBB: case 0xBC: case 0xBD:
 		case 0xBE: case 0xBF: { BYTE src = GetReg(op & 7); int r = A - src; SetFlagsSub(A, src, r); return cycles; }
 
-				 // Операции с непосредственным значением (Иммедиат)
+				 // РћРїРµСЂР°С†РёРё СЃ РЅРµРїРѕСЃСЂРµРґСЃС‚РІРµРЅРЅС‹Рј Р·РЅР°С‡РµРЅРёРµРј (РРјРјРµРґРёР°С‚)
 		case 0xC6: { BYTE imm = Read(PC++); int r = A + imm; SetFlagsAdd(A, imm, r); A = (BYTE)r; return cycles; }
 		case 0xCE: { BYTE imm = Read(PC++); int r = A + imm + (CY ? 1 : 0); SetFlagsAdd(A, imm, r); A = (BYTE)r; return cycles; }
 		case 0xD6: { BYTE imm = Read(PC++); int r = A - imm; SetFlagsSub(A, imm, r); A = (BYTE)r; return cycles; }
@@ -396,12 +396,12 @@ struct CPU8080 {
 		case 0xF6: { A |= Read(PC++); CY = false; AC = false; SetFlagsZSP(A); return cycles; }
 		case 0xFE: { BYTE imm = Read(PC++); int r = A - imm; SetFlagsSub(A, imm, r); return cycles; }
 
-				 // Безусловные JMP / CALL / RET
+				 // Р‘РµР·СѓСЃР»РѕРІРЅС‹Рµ JMP / CALL / RET
 		case 0xC3: { WORD l = Read(PC++); WORD h = Read(PC++); PC = (h << 8) | l; return cycles; }
 		case 0xCD: { WORD l = Read(PC++); WORD h = Read(PC++); Write(--SP, PC >> 8); Write(--SP, PC & 0xFF); PC = (h << 8) | l; return cycles; }
 		case 0xC9: { WORD l = Read(SP++); WORD h = Read(SP++); PC = (h << 8) | l; return cycles; }
 
-				 // Возвраты по условию (При переходе тратится 11 тактов вместо 5 базовых)
+				 // Р’РѕР·РІСЂР°С‚С‹ РїРѕ СѓСЃР»РѕРІРёСЋ (РџСЂРё РїРµСЂРµС…РѕРґРµ С‚СЂР°С‚РёС‚СЃСЏ 11 С‚Р°РєС‚РѕРІ РІРјРµСЃС‚Рѕ 5 Р±Р°Р·РѕРІС‹С…)
 		case 0xC0: if (!Z) { WORD l = Read(SP++); WORD h = Read(SP++); PC = (h << 8) | l; cycles = 11; } return cycles;
 		case 0xC8: if (Z) { WORD l = Read(SP++); WORD h = Read(SP++); PC = (h << 8) | l; cycles = 11; } return cycles;
 		case 0xD0: if (!CY) { WORD l = Read(SP++); WORD h = Read(SP++); PC = (h << 8) | l; cycles = 11; } return cycles;
@@ -411,7 +411,7 @@ struct CPU8080 {
 		case 0xF0: if (!S) { WORD l = Read(SP++); WORD h = Read(SP++); PC = (h << 8) | l; cycles = 11; } return cycles;
 		case 0xF8: if (S) { WORD l = Read(SP++); WORD h = Read(SP++); PC = (h << 8) | l; cycles = 11; } return cycles;
 
-			// Переходы по условию (Всегда занимают 10 тактов в 8080)
+			// РџРµСЂРµС…РѕРґС‹ РїРѕ СѓСЃР»РѕРІРёСЋ (Р’СЃРµРіРґР° Р·Р°РЅРёРјР°СЋС‚ 10 С‚Р°РєС‚РѕРІ РІ 8080)
 		case 0xC2: { WORD l = Read(PC++); WORD h = Read(PC++); if (!Z) { PC = (h << 8) | l; } return cycles; }
 		case 0xCA: { WORD l = Read(PC++); WORD h = Read(PC++); if (Z) { PC = (h << 8) | l; } return cycles; }
 		case 0xD2: { WORD l = Read(PC++); WORD h = Read(PC++); if (!CY) { PC = (h << 8) | l; } return cycles; }
@@ -421,7 +421,7 @@ struct CPU8080 {
 		case 0xF2: { WORD l = Read(PC++); WORD h = Read(PC++); if (!S) { PC = (h << 8) | l; } return cycles; }
 		case 0xFA: { WORD l = Read(PC++); WORD h = Read(PC++); if (S) { PC = (h << 8) | l; } return cycles; }
 
-				 // Вызовы по условию (При вызове тратится 17 тактов вместо 11 базовых)
+				 // Р’С‹Р·РѕРІС‹ РїРѕ СѓСЃР»РѕРІРёСЋ (РџСЂРё РІС‹Р·РѕРІРµ С‚СЂР°С‚РёС‚СЃСЏ 17 С‚Р°РєС‚РѕРІ РІРјРµСЃС‚Рѕ 11 Р±Р°Р·РѕРІС‹С…)
 		case 0xC4: { WORD l = Read(PC++); WORD h = Read(PC++); if (!Z) { Write(--SP, PC >> 8); Write(--SP, PC & 0xFF); PC = (h << 8) | l; cycles = 17; } return cycles; }
 		case 0xCC: { WORD l = Read(PC++); WORD h = Read(PC++); if (Z) { Write(--SP, PC >> 8); Write(--SP, PC & 0xFF); PC = (h << 8) | l; cycles = 17; } return cycles; }
 		case 0xD4: { WORD l = Read(PC++); WORD h = Read(PC++); if (!CY) { Write(--SP, PC >> 8); Write(--SP, PC & 0xFF); PC = (h << 8) | l; cycles = 17; } return cycles; }
@@ -475,19 +475,19 @@ struct CPU8080 {
 		case 0xE1: L = Read(SP++); H = Read(SP++); return cycles;
 		case 0xF1: { BYTE psw = Read(SP++); A = Read(SP++); S = (psw & 0x80) != 0; Z = (psw & 0x40) != 0; AC = (psw & 0x10) != 0; P = (psw & 0x04) != 0; CY = (psw & 0x01) != 0; return cycles; }
 
-				 // Прямая адресация (STA, LDA, SHLD, LHLD)
+				 // РџСЂСЏРјР°СЏ Р°РґСЂРµСЃР°С†РёСЏ (STA, LDA, SHLD, LHLD)
 		case 0x32: { WORD l = Read(PC++); WORD h = Read(PC++); Write((h << 8) | l, A); return cycles; }
 		case 0x3A: { WORD l = Read(PC++); WORD h = Read(PC++); A = Read((h << 8) | l); return cycles; }
 		case 0x22: { WORD l = Read(PC++); WORD h = Read(PC++); WORD a = (h << 8) | l; Write(a, L); Write(a + 1, H); return cycles; }
 		case 0x2A: { WORD l = Read(PC++); WORD h = Read(PC++); WORD a = (h << 8) | l; L = Read(a); H = Read(a + 1); return cycles; }
 
-				 // Косвенная адресация
+				 // РљРѕСЃРІРµРЅРЅР°СЏ Р°РґСЂРµСЃР°С†РёСЏ
 		case 0x02: Write(GetBC(), A); return cycles;
 		case 0x12: Write(GetDE(), A); return cycles;
 		case 0x0A: A = Read(GetBC()); return cycles;
 		case 0x1A: A = Read(GetDE()); return cycles;
 
-			// Циклические сдвиги аккумулятора
+			// Р¦РёРєР»РёС‡РµСЃРєРёРµ СЃРґРІРёРіРё Р°РєРєСѓРјСѓР»СЏС‚РѕСЂР°
 		case 0x07: { CY = (A & 0x80) != 0; A = (BYTE)(((A << 1) | (CY ? 1 : 0)) & 0xFF); return cycles; }
 		case 0x0F: { CY = (A & 1) != 0; A = (BYTE)(((A >> 1) | (CY ? 0x80 : 0)) & 0xFF); return cycles; }
 		case 0x17: { bool old_cy = CY; CY = (A & 0x80) != 0; A = (BYTE)(((A << 1) | (old_cy ? 1 : 0)) & 0xFF); return cycles; }
@@ -502,7 +502,7 @@ struct CPU8080 {
             // IN port
         case 0xDB: A = PortInput(Read(PC++)); break;
 
-				 // Десятичная коррекция аккумулятора (DAA)
+				 // Р”РµСЃСЏС‚РёС‡РЅР°СЏ РєРѕСЂСЂРµРєС†РёСЏ Р°РєРєСѓРјСѓР»СЏС‚РѕСЂР° (DAA)
 		case 0x27: {
 			BYTE corr = 0; bool new_cy = CY;
 			if ((A & 0x0F) > 9 || AC) corr |= 0x06;
@@ -511,7 +511,7 @@ struct CPU8080 {
 			A = (BYTE)res; CY = new_cy; SetFlagsZSP(A); return cycles;
 		}
 
-				 // Специальные команды
+				 // РЎРїРµС†РёР°Р»СЊРЅС‹Рµ РєРѕРјР°РЅРґС‹
 		case 0x2F: A = (BYTE)(~A & 0xFF); return cycles;
 		case 0x37: CY = true; return cycles;
 		case 0x3F: CY = !CY; return cycles;
@@ -519,8 +519,8 @@ struct CPU8080 {
 		case 0xE3: { BYTE l = Read(SP); BYTE h = Read(SP + 1); Write(SP, L); Write(SP + 1, H); L = l; H = h; return cycles; }
 		case 0xF9: SP = GetHL(); return cycles;
 		case 0xE9: PC = GetHL(); return cycles;
-		case 0xFB: EI = true; INTE = true; rk_inte_speaker_state = true; return cycles;  // EI включает INTE
-		case 0xF3: EI = false; INTE = false; rk_inte_speaker_state = false; return cycles; // DI выключает INTE
+		case 0xFB: EI = true; INTE = true; rk_inte_speaker_state = true; return cycles;  // EI РІРєР»СЋС‡Р°РµС‚ INTE
+		case 0xF3: EI = false; INTE = false; rk_inte_speaker_state = false; return cycles; // DI РІС‹РєР»СЋС‡Р°РµС‚ INTE
 		}
 		return cycles;
 	}
@@ -615,16 +615,16 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
                     btnIndex++;
                 }
             }
-            HWND hCheckC1Init = CreateWindowW(L"BUTTON", L"Трубка поднята (Вход C1 = 0)", 
+            HWND hCheckC1Init = CreateWindowW(L"BUTTON", L"РўСЂСѓР±РєР° РїРѕРґРЅСЏС‚Р° (Р’С…РѕРґ C1 = 0)", 
                 WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX, 
                 20, 285, 340, 20, hwnd, (HMENU)200, NULL, NULL);
             SendMessageW(hCheckC1Init, BM_SETCHECK, BST_CHECKED, 0); 
 
-            CreateWindowW(L"BUTTON", L"Дополнительный вход (Вход C0 = 1)", 
+            CreateWindowW(L"BUTTON", L"Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Р№ РІС…РѕРґ (Р’С…РѕРґ C0 = 1)", 
                 WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX, 
                 20, 310, 340, 20, hwnd, (HMENU)201, NULL, NULL);
 
-            CreateWindowW(L"BUTTON", L"Аппаратный сброс (RESET)", 
+            CreateWindowW(L"BUTTON", L"РђРїРїР°СЂР°С‚РЅС‹Р№ СЃР±СЂРѕСЃ (RESET)", 
                 WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 
                 20, 335, 340, 35, hwnd, (HMENU)202, NULL, NULL);
 
@@ -676,7 +676,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 const double PIT_CLOCK_HZ = 1780000.0;
 const double TICKS_PER_SAMPLE = PIT_CLOCK_HZ / (double)AUDIO_SAMPLE_RATE;
 
-// Генерирование звука через КР580ВИ53 на основе накопленной фазы частоты
+// Р“РµРЅРµСЂРёСЂРѕРІР°РЅРёРµ Р·РІСѓРєР° С‡РµСЂРµР· РљР 580Р’Р53 РЅР° РѕСЃРЅРѕРІРµ РЅР°РєРѕРїР»РµРЅРЅРѕР№ С„Р°Р·С‹ С‡Р°СЃС‚РѕС‚С‹
 void FillAudioBuffer(short* buffer, int samplesCount) {
     static double ticks_accumulator = 0.0;
 
@@ -693,20 +693,20 @@ void FillAudioBuffer(short* buffer, int samplesCount) {
         int active_channels = 0;
         int mixed_signal = 0;
 
-        // 2. Извлечение СИНХРОННОГО микшированного сигнала из кольцевого буфера
+        // 2. РР·РІР»РµС‡РµРЅРёРµ РЎРРќРҐР РћРќРќРћР“Рћ РјРёРєС€РёСЂРѕРІР°РЅРЅРѕРіРѕ СЃРёРіРЅР°Р»Р° РёР· РєРѕР»СЊС†РµРІРѕРіРѕ Р±СѓС„РµСЂР°
         int mixed_hardware_signal = 0;
         if (inte_ring_read_ptr != inte_ring_write_ptr) {
             mixed_hardware_signal = inte_ring_buffer[inte_ring_read_ptr];
             inte_ring_read_ptr = (inte_ring_read_ptr + 1) % INTE_RING_BUF_SIZE;
         }
         else {
-            // Если буфер пуст, стабилизируем текущее состояние звука
+            // Р•СЃР»Рё Р±СѓС„РµСЂ РїСѓСЃС‚, СЃС‚Р°Р±РёР»РёР·РёСЂСѓРµРј С‚РµРєСѓС‰РµРµ СЃРѕСЃС‚РѕСЏРЅРёРµ Р·РІСѓРєР°
             int inte_part = rk_inte_speaker_state ? 3000 : -3000;
             int port_c_part = rk_port_c_speaker_state ? 3000 : -3000;
             mixed_hardware_signal = inte_part + port_c_part;
         }
 
-        // 3. Финальная запись сэмпла в звуковую карту Windows
+        // 3. Р¤РёРЅР°Р»СЊРЅР°СЏ Р·Р°РїРёСЃСЊ СЃСЌРјРїР»Р° РІ Р·РІСѓРєРѕРІСѓСЋ РєР°СЂС‚Сѓ Windows
         if (active_channels > 0) {
             int vi53_signal = mixed_signal * 5000 / active_channels;
             buffer[i] = (short)((vi53_signal + mixed_hardware_signal) / 2);
@@ -729,11 +729,11 @@ static double audio_ticks_accumulator = 0.0;
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
     if (!LoadROM(L"rom.bin")) {
-        MessageBoxW(NULL, L"Файл прошивки ПЗУ 'rom.bin' не найден! Будет использована пустая память.", 
-            L"Внимание", MB_OK | MB_ICONWARNING);
+        MessageBoxW(NULL, L"Р¤Р°Р№Р» РїСЂРѕС€РёРІРєРё РџР—РЈ 'rom.bin' РЅРµ РЅР°Р№РґРµРЅ! Р‘СѓРґРµС‚ РёСЃРїРѕР»СЊР·РѕРІР°РЅР° РїСѓСЃС‚Р°СЏ РїР°РјСЏС‚СЊ.", 
+            L"Р’РЅРёРјР°РЅРёРµ", MB_OK | MB_ICONWARNING);
     }
     cpu.PC = 0x0000; 
-    cpu.SP = 0x87FF; // ИСПРАВЛЕНО: Стартовая инициализация вершины стека нового ОЗУ на 0x87FF
+    cpu.SP = 0x87FF; // РРЎРџР РђР’Р›Р•РќРћ: РЎС‚Р°СЂС‚РѕРІР°СЏ РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РІРµСЂС€РёРЅС‹ СЃС‚РµРєР° РЅРѕРІРѕРіРѕ РћР—РЈ РЅР° 0x87FF
     cpu.halted = false; cpu.INTE = false;
     cpu.ppi_pa = 0; cpu.ppi_pb = 0; cpu.ppi_pc = 0x00; cpu.ppi_ctrl = 0;
 
@@ -747,7 +747,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     if (!RegisterClassExW(&wc)) return 0;
     
     HWND hwnd = CreateWindowExW(WS_EX_CONTROLPARENT, L"K580SimulatorClass", 
-        L"Симулятор К580ВМ80 / ВВ55 (С отладчиком и ОЗУ)", 
+        L"РЎРёРјСѓР»СЏС‚РѕСЂ Рљ580Р’Рњ80 / Р’Р’55 (РЎ РѕС‚Р»Р°РґС‡РёРєРѕРј Рё РћР—РЈ)", 
         WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX, 
         CW_USEDEFAULT, CW_USEDEFAULT, 660, 735, NULL, NULL, hInstance, NULL);
     
@@ -780,11 +780,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     QueryPerformanceFrequency(&frequency);
     QueryPerformanceCounter(&last_hardware_time);
 
-    const double SYSTEM_CLOCK_HZ = 1780000.0; // Частота ядра (1.78 МГц)
+    const double SYSTEM_CLOCK_HZ = 1780000.0; // Р§Р°СЃС‚РѕС‚Р° СЏРґСЂР° (1.78 РњР“С†)
     double time_since_last_interrupt = 0.0;
 
     while (emulator_running) {
-        // Ожидание системных событий во избежание 100% загрузки процессора ПК
+        // РћР¶РёРґР°РЅРёРµ СЃРёСЃС‚РµРјРЅС‹С… СЃРѕР±С‹С‚РёР№ РІРѕ РёР·Р±РµР¶Р°РЅРёРµ 100% Р·Р°РіСЂСѓР·РєРё РїСЂРѕС†РµСЃСЃРѕСЂР° РџРљ
         MsgWaitForMultipleObjectsEx(0, NULL, 1, QS_ALLINPUT, MWMO_INPUTAVAILABLE);
         while (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE)) {
             if (msg.message == WM_QUIT) {
@@ -798,16 +798,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
         if (!emulator_running) break;
 
-        // --- ДИСПЕТЧЕР И ТАКТОВАЯ СИНХРОНИЗАЦИЯ ЯДРА ---
+        // --- Р”РРЎРџР•РўР§Р•Р  Р РўРђРљРўРћР’РђРЇ РЎРРќРҐР РћРќРР—РђР¦РРЇ РЇР”Р Рђ ---
         LARGE_INTEGER current_hardware_time;
         QueryPerformanceCounter(&current_hardware_time);
         double elapsed_seconds = (double)(current_hardware_time.QuadPart - last_hardware_time.QuadPart) / frequency.QuadPart;
 
-        if (elapsed_seconds > 0.1) elapsed_seconds = 0.1; // Защита от лагов Windows
+        if (elapsed_seconds > 0.1) elapsed_seconds = 0.1; // Р—Р°С‰РёС‚Р° РѕС‚ Р»Р°РіРѕРІ Windows
 
         if (elapsed_seconds > 0.0) {
             last_hardware_time = current_hardware_time;
-            internal_cycles_debt += elapsed_seconds * SYSTEM_CLOCK_HZ; // Накапливаем такты ПК
+            internal_cycles_debt += elapsed_seconds * SYSTEM_CLOCK_HZ; // РќР°РєР°РїР»РёРІР°РµРј С‚Р°РєС‚С‹ РџРљ
 
             int cycles_to_execute = (int)internal_cycles_debt;
             if (cycles_to_execute > 0) {
@@ -817,35 +817,35 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                     cycles_to_execute -= elapsed_ticks;
                     internal_cycles_debt -= elapsed_ticks;
 
-                    // Накапливаем процессорные такты для генерации звука
+                    // РќР°РєР°РїР»РёРІР°РµРј РїСЂРѕС†РµСЃСЃРѕСЂРЅС‹Рµ С‚Р°РєС‚С‹ РґР»СЏ РіРµРЅРµСЂР°С†РёРё Р·РІСѓРєР°
                     audio_ticks_accumulator += elapsed_ticks;
                     while (audio_ticks_accumulator >= TICKS_PER_SAMPLE) {
                         audio_ticks_accumulator -= TICKS_PER_SAMPLE;
 
-                        // Вычисляем уровень сигнала для INTE
+                        // Р’С‹С‡РёСЃР»СЏРµРј СѓСЂРѕРІРµРЅСЊ СЃРёРіРЅР°Р»Р° РґР»СЏ INTE
                         int inte_part = rk_inte_speaker_state ? 3000 : -3000;
 
-                        // Вычисляем уровень сигнала для Порта C
+                        // Р’С‹С‡РёСЃР»СЏРµРј СѓСЂРѕРІРµРЅСЊ СЃРёРіРЅР°Р»Р° РґР»СЏ РџРѕСЂС‚Р° C
                         int port_c_part = rk_port_c_speaker_state ? 3000 : -3000;
 
-                        // Смешиваем (микшируем) оба сигнала в один сэмпл
+                        // РЎРјРµС€РёРІР°РµРј (РјРёРєС€РёСЂСѓРµРј) РѕР±Р° СЃРёРіРЅР°Р»Р° РІ РѕРґРёРЅ СЃСЌРјРїР»
                         short sample = (short)(inte_part + port_c_part);
 
-                        // Записываем в кольцевой буфер
+                        // Р—Р°РїРёСЃС‹РІР°РµРј РІ РєРѕР»СЊС†РµРІРѕР№ Р±СѓС„РµСЂ
                         int next_write = (inte_ring_write_ptr + 1) % INTE_RING_BUF_SIZE;
 
-                        // Защита от переполнения буфера
+                        // Р—Р°С‰РёС‚Р° РѕС‚ РїРµСЂРµРїРѕР»РЅРµРЅРёСЏ Р±СѓС„РµСЂР°
                         if (next_write != inte_ring_read_ptr) {
                             inte_ring_buffer[inte_ring_write_ptr] = sample;
                             inte_ring_write_ptr = next_write;
                         }
                     }
 
-                    // Отсчитываем такты до кадрового прерывания 50 Гц
+                    // РћС‚СЃС‡РёС‚С‹РІР°РµРј С‚Р°РєС‚С‹ РґРѕ РєР°РґСЂРѕРІРѕРіРѕ РїСЂРµСЂС‹РІР°РЅРёСЏ 50 Р“С†
                     cpu.cycles_until_interrupt -= elapsed_ticks;
                     if (cpu.cycles_until_interrupt <= 0) {
-                        cpu.int_pending = true; // Выставляем запрос на прерывание для процессора
-                        cpu.cycles_until_interrupt += 35600; // На запуск следующего кадра
+                        cpu.int_pending = true; // Р’С‹СЃС‚Р°РІР»СЏРµРј Р·Р°РїСЂРѕСЃ РЅР° РїСЂРµСЂС‹РІР°РЅРёРµ РґР»СЏ РїСЂРѕС†РµСЃСЃРѕСЂР°
+                        cpu.cycles_until_interrupt += 35600; // РќР° Р·Р°РїСѓСЃРє СЃР»РµРґСѓСЋС‰РµРіРѕ РєР°РґСЂР°
 
 
                         // Real-time title bar hardware tracer injection
@@ -859,7 +859,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                         // Push the formatted bit pattern directly into the application window header
                         SetWindowTextW(hwnd, titleBuf);
 
-                        // Логика плавного затухания динамической индикации дисплея
+                        // Р›РѕРіРёРєР° РїР»Р°РІРЅРѕРіРѕ Р·Р°С‚СѓС…Р°РЅРёСЏ РґРёРЅР°РјРёС‡РµСЃРєРѕР№ РёРЅРґРёРєР°С†РёРё РґРёСЃРїР»РµСЏ
                         for (int d = 0; d < 8; ++d) {
                             if (digit_lifetime[d] > 0) {
                                 digit_lifetime[d]--;
@@ -870,44 +870,44 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                             }
                         }
 
-                        // Обновление текстового табло индикации
+                        // РћР±РЅРѕРІР»РµРЅРёРµ С‚РµРєСЃС‚РѕРІРѕРіРѕ С‚Р°Р±Р»Рѕ РёРЅРґРёРєР°С†РёРё
                         wchar_t textBuf[33];
                         swprintf_s(textBuf, 33, L"[ %c%c%c%c%c%c%c%c ]",
                             display_digits[0], display_digits[1], display_digits[2], display_digits[3],
                             display_digits[4], display_digits[5], display_digits[6], display_digits[7]);
                         SetWindowTextW(hEditDisplay, textBuf);
 
-                        // Считываем скан-код кнопки строго из подтвержденной ячейки 0x82CE
+                        // РЎС‡РёС‚С‹РІР°РµРј СЃРєР°РЅ-РєРѕРґ РєРЅРѕРїРєРё СЃС‚СЂРѕРіРѕ РёР· РїРѕРґС‚РІРµСЂР¶РґРµРЅРЅРѕР№ СЏС‡РµР№РєРё 0x82CE
                         BYTE firmware_key_code = ram[0x82CE - 0x8000];
 
-                        // Считываем состояние рычага трубки из верифицированной ячейки 0x82B8
+                        // РЎС‡РёС‚С‹РІР°РµРј СЃРѕСЃС‚РѕСЏРЅРёРµ СЂС‹С‡Р°РіР° С‚СЂСѓР±РєРё РёР· РІРµСЂРёС„РёС†РёСЂРѕРІР°РЅРЅРѕР№ СЏС‡РµР№РєРё 0x82B8
                         BYTE hook_status = ram[0x82B8 - 0x8000];
 
-                        // Динамически вычисляем виртуальный статус ROM_MODE для отладчика:
-                        // Если трубка поднята (hook_status == 0) и был считан код кнопки '4' (0x04)
-                        // или микропрограмма уже начала обработку (например, PC ушел в верхние адреса)
+                        // Р”РёРЅР°РјРёС‡РµСЃРєРё РІС‹С‡РёСЃР»СЏРµРј РІРёСЂС‚СѓР°Р»СЊРЅС‹Р№ СЃС‚Р°С‚СѓСЃ ROM_MODE РґР»СЏ РѕС‚Р»Р°РґС‡РёРєР°:
+                        // Р•СЃР»Рё С‚СЂСѓР±РєР° РїРѕРґРЅСЏС‚Р° (hook_status == 0) Рё Р±С‹Р» СЃС‡РёС‚Р°РЅ РєРѕРґ РєРЅРѕРїРєРё '4' (0x04)
+                        // РёР»Рё РјРёРєСЂРѕРїСЂРѕРіСЂР°РјРјР° СѓР¶Рµ РЅР°С‡Р°Р»Р° РѕР±СЂР°Р±РѕС‚РєСѓ (РЅР°РїСЂРёРјРµСЂ, PC СѓС€РµР» РІ РІРµСЂС…РЅРёРµ Р°РґСЂРµСЃР°)
                         BYTE firmware_mode_flag = 0x00;
                         if (hook_status == 0x00) {
-                            // Если считана кнопка "4", фиксируем активацию режима эхо-печати
+                            // Р•СЃР»Рё СЃС‡РёС‚Р°РЅР° РєРЅРѕРїРєР° "4", С„РёРєСЃРёСЂСѓРµРј Р°РєС‚РёРІР°С†РёСЋ СЂРµР¶РёРјР° СЌС…Рѕ-РїРµС‡Р°С‚Рё
                             if (firmware_key_code == 0x04 || cpu.PC > 0x0100) {
                                 firmware_mode_flag = 0x01;
                             }
                         }
 
-                        // Формирование лога регистров CPU и переменных ПЗУ
+                        // Р¤РѕСЂРјРёСЂРѕРІР°РЅРёРµ Р»РѕРіР° СЂРµРіРёСЃС‚СЂРѕРІ CPU Рё РїРµСЂРµРјРµРЅРЅС‹С… РџР—РЈ
                         wchar_t debugBuf[513];
                         swprintf_s(debugBuf, 512,
                             L"--- REGISTERS ---\r\nA: 0x%02X\r\nBC: 0x%02X%02X\r\nDE: 0x%02X%02X\r\nHL: 0x%02X%02X\r\nSP: 0x%04X\r\nPC: 0x%04X\r\n\r\n--- FLAGS ---\r\nS:%d Z:%d AC:%d P:%d CY:%d\r\n\r\n--- STATE ---\r\nHALT: %s\r\nINTE: %s\r\nGUI_KEY: %c\r\n\r\n--- ROM VARIABLES ---\r\nROM_KEY: 0x%02X\r\nROM_MODE: 0x%02X\r\nLINE: 0x%02X",
                             cpu.A, cpu.B, cpu.C, cpu.D, cpu.E, cpu.H, cpu.L, cpu.SP, cpu.PC,
                             (cpu.S) ? 1 : 0, (cpu.Z) ? 1 : 0, (cpu.AC) ? 1 : 0, (cpu.P) ? 1 : 0, (cpu.CY) ? 1 : 0,
                             cpu.halted ? L"TRUE" : L"FALSE", cpu.INTE ? L"TRUE" : L"FALSE", last_read_key_char,
-                            firmware_key_code,   // Теперь покажет реальный код из 0x421F (вместо застывшего 0x76)
-                            firmware_mode_flag,  // Покажет 0x01 при успешном переключении режима
-                            hook_status          // Покажет состояние из 0x421E
+                            firmware_key_code,   // РўРµРїРµСЂСЊ РїРѕРєР°Р¶РµС‚ СЂРµР°Р»СЊРЅС‹Р№ РєРѕРґ РёР· 0x421F (РІРјРµСЃС‚Рѕ Р·Р°СЃС‚С‹РІС€РµРіРѕ 0x76)
+                            firmware_mode_flag,  // РџРѕРєР°Р¶РµС‚ 0x01 РїСЂРё СѓСЃРїРµС€РЅРѕРј РїРµСЂРµРєР»СЋС‡РµРЅРёРё СЂРµР¶РёРјР°
+                            hook_status          // РџРѕРєР°Р¶РµС‚ СЃРѕСЃС‚РѕСЏРЅРёРµ РёР· 0x421E
                         );
                         SetWindowTextW(hEditDebug, debugBuf);
 
-                        // Отрисовка дампа RAM Tracker (0x82B0 - 0x82FF, идеальный фокус на все переменные АТС)
+                        // РћС‚СЂРёСЃРѕРІРєР° РґР°РјРїР° RAM Tracker (0x82B0 - 0x82FF, РёРґРµР°Р»СЊРЅС‹Р№ С„РѕРєСѓСЃ РЅР° РІСЃРµ РїРµСЂРµРјРµРЅРЅС‹Рµ РђРўРЎ)
                         wchar_t ramDump[8192] = L"--- RAM TRACKER (0x82B0 - 0x82FF) ---\r\n";
                         wchar_t ramLine[128];
                         for (WORD addr = 0x82B0; addr <= 0x82FF; addr += 16) {
@@ -926,7 +926,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                             wcscat_s(ramDump, 8192, L"\r\n");
                         }
                         SetWindowTextW(hEditRAM, ramDump);
-                        // --- НОВОЕ: Отрисовка дампа памяти для региона 0x8000 - 0x807F ---
+                        // --- РќРћР’РћР•: РћС‚СЂРёСЃРѕРІРєР° РґР°РјРїР° РїР°РјСЏС‚Рё РґР»СЏ СЂРµРіРёРѕРЅР° 0x8000 - 0x807F ---
                         wchar_t ramLowDump[4096] = L"--- RAM TRACKER (0x8000 - 0x807F) ---\r\n";
                         wchar_t ramLowLine[128];
                         for (WORD addr = 0x8000; addr <= 0x807F; addr += 16) {
@@ -951,11 +951,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         }
 
         if (internal_cycles_debt <= 0.0) {
-            Sleep(1); // Освобождаем CPU ПК
+            Sleep(1); // РћСЃРІРѕР±РѕР¶РґР°РµРј CPU РџРљ
         }
     }
 
-    // --- Безопасная очистка аудиодескрипторов перед выходом ---
+    // --- Р‘РµР·РѕРїР°СЃРЅР°СЏ РѕС‡РёСЃС‚РєР° Р°СѓРґРёРѕРґРµСЃРєСЂРёРїС‚РѕСЂРѕРІ РїРµСЂРµРґ РІС‹С…РѕРґРѕРј ---
     if (hWaveOut) {
         for (int i = 0; i < 2; i++) {
             waveOutUnprepareHeader(hWaveOut, &waveHeader[i], sizeof(WAVEHDR));
