@@ -59,7 +59,8 @@ UINT_PTR timerId = 0;
 WNDPROC OldButtonProc = NULL; 
 
 char DecodeSegment(BYTE segments) {
-    BYTE mask = (~segments) & 0x7F;
+    BYTE mask = (~segments) & 0x7F; // Индикатор с общим анодом
+//    BYTE mask = segments & 0x7F; // Индикатор с общим катодом, для AON580_TEST.bin
     switch (mask) {
         // Стандартные символы
     case 0x3F: return '0'; case 0x06: return '1'; case 0x5B: return '2';
